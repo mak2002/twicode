@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enter Tweet</title>
+  </head>
+  <body>
+    <h1>Enter Tweet</h1>
+
+    <label for="tweet">Tweet:</label><br />
+    <textarea
+      rows="10"
+      cols="80"
+      type="text"
+      id="tweet"
+      name="tweet"
+    ></textarea>
+    <br />
+    <input type="datetime-local" id="birthdaytime" name="birthdaytime" />
+
+    <br />
+    <br />
+    <button onclick="getTweet()" type="submit">Submit</button>
+  </body>
+
+  <script>
+    function getTweet() {
+      var tweet = document.getElementById("tweet").value;
+      console.log(tweet);
+    }
+  </script>
+</html>

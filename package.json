@@ -15,7 +15,11 @@
     "commands": [
       {
         "command": "twicode.helloWorld",
-        "title": "Hello World"
+        "title": "hello"
+      },
+      {
+        "command": "twicode.scheduleTweet",
+        "title": "Schedule Tweet"
       }
     ]
   },
