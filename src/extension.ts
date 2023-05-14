@@ -1,13 +1,28 @@
 import path = require("path");
 import * as vscode from "vscode";
 import * as fs from "fs";
+import { client } from "./server/server";
+require("dotenv").config();
 
-export function activate(context: vscode.ExtensionContext) {
-  console.log('Congratulations, your extension "twicode" is now active!');
+export async function activate(context: vscode.ExtensionContext) {
+  await client.query(
+    `CREATE TABLE scheduled_tweets (
+    id SERIAL PRIMARY KEY,
+    tweet_text TEXT NOT NULL,
+    scheduled_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`,
+    []
+  );
 
-  let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
-    vscode.window.showInformationMessage("Its working");
-  });
+  await client.connect();
+
+  let disposable = vscode.commands.registerCommand(
+    "twicode.helloWorld",
+    async () => {
+      vscode.window.showInformationMessage("Its working!!");
+    }
+  );
 
   vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
     const panel = vscode.window.createWebviewPanel(
@@ -25,8 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
     panel.webview.html = fs.readFileSync(htmlPath.fsPath, { encoding: "utf8" });
   });
 
+  await client.disconnect();
   context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

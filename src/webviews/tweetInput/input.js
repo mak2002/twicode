@@ -1,5 +1,7 @@
-console.log("input.js");
 function getTweet() {
-  console.log("getTweet");
-  return document.getElementById("tweet").value;
+  var tweet = document.getElementById("tweet").value;
+
+  // Send tweet to background script
+  chrome.runtime.sendMessage({ tweet: tweet });
+  console.log(tweet);
 }
