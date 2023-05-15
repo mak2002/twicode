@@ -1,50 +1,32 @@
-import { Client, ClientConfig } from "pg";
+import express = require("express");
+import { Pool } from "pg";
 import { dbconfig } from "../dbcred";
+import * as cors from "cors";
+import { connectionString } from "../dbcred";
 
-export class DatabaseClient {
-  client: Client;
-  private static instance_: DatabaseClient | null = null;
-  
+export async function startServer() {
+  const app = express();
+  const port = 3000; 
 
-  private constructor(config: ClientConfig) {
-    this.client = new Client(config);
-  }
+  app.use(cors());
 
-  static instance(config: ClientConfig): DatabaseClient {
-    if (!this.instance_) {
-      this.instance_ = new DatabaseClient(config);
-    }
+  const pool = new Pool(dbconfig);
 
-    return this.instance_;
-  }
+  app.post("/api/tweets", async (req, res) => {
+    const { tweetText, scheduledTime } = req.body;
+    const sql = `INSERT INTO scheduled_tweets (tweet_text, scheduled_time) VALUES ($1, $2)`;
+    const values = [tweetText, scheduledTime];
 
-  async connect() {
     try {
-      await this.client.connect();
-      console.log("Database connected");
-    } catch (err) {
-      console.error("Error connecting to database:", err);
-    }
-  }
-
-  async disconnect() {
-    try {
-      await this.client.end();
-      console.log("Database disconnected");
-    } catch (err) {
-      console.error("Error disconnecting from database:", err);
-    }
-  }
-
-  async query(sql: string, values: any[]) {
-    try {
-      const result = await this.client.query(sql, values);
-      return result;
+      const result = await pool.query(sql, values);
+      res.json(result);
     } catch (err) {
       console.error("Error executing query:", err);
-      throw err;
+      res.status(500).json(err);
     }
-  }
-}
+  });
 
-export const client = DatabaseClient.instance(dbconfig);
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}

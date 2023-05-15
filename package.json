@@ -9,9 +9,35 @@
   "categories": [
     "Other"
   ],
+  "content_security_policy": "default-src 'none'; style-src vscode-resource: 'unsafe-inline'; script-src vscode-resource: 'unsafe-inline' 'unsafe-eval' vscode-webview-resource:; media-src vscode-resource:; img-src vscode-resource: data:; connect-src vscode-resource: http://localhost:3000",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "addTweet",
+          "title": "My Webview",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "addTweet": [
+        {
+          "id": "addTweet",
+          "name": "My View",
+          "webview": {
+            "retainContextWhenHidden": true,
+            "enableFindWidget": true,
+            "localResourceRoots": [
+              "${webviewRootUri}"
+            ],
+            "webview-src": "./src/webviews/tweetInput/input.html"
+          }
+        }
+      ]
+    },
     "commands": [
       {
         "command": "twicode.helloWorld",
@@ -35,6 +61,8 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
@@ -52,6 +80,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "pg": "^8.10.0",
