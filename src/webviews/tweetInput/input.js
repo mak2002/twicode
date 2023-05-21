@@ -16,7 +16,7 @@ function getTweet() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(sqlQuery),
+    body: JSON.stringify({tweet, scheduled_time}),
   })
     .then((response) => response.json())
     .then((data) => {
