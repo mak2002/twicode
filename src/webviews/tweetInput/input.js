@@ -1,5 +1,17 @@
+function showMessage(message) {
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left
+  );
+  statusBarItem.text = message;
+  statusBarItem.show();
+
+  setTimeout(() => {
+    statusBarItem.hide();
+    statusBarItem.dispose();
+  }, 3000);
+}
+
 function getTweet() {
-  // Get tweet data
   var tweet = document.getElementById("tweet").value;
   var scheduled_time = document.getElementById("scheduled_time").value;
 
@@ -16,13 +28,14 @@ function getTweet() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({tweet, scheduled_time}),
+    body: JSON.stringify({ tweet, scheduled_time }),
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
         console.log("Query executed successfully");
         console.log("Result:", data.result);
+        window.prompt("Tweet scheduled successfully!")
       } else {
         console.error("Error executing query:", data.error);
       }

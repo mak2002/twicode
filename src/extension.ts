@@ -1,26 +1,58 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { dbconfig } from "./dbcred";
 import { client } from "./server/DbClient";
 import { startServer } from "./server/server";
 
 export async function activate(context: vscode.ExtensionContext) {
-
   client.connect();
-
   client.createTweetsTable();
-
   await startServer();
-  
+
   console.log("Twicode is now active!");
 
-  let disposable = vscode.commands.registerCommand(
-    "twicode.helloWorld",
-    async () => {
-      vscode.window.showInformationMessage("It's working!!");
-    }
-  );
+  let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
+    vscode.window.showInformationMessage("It's working!!");
+  });
+
+  vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
+    const panel = vscode.window.createWebviewPanel(
+      "scheduledTweets",
+      "Scheduled Tweets",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+      }
+    );
+
+    const htmlPath = path.join(
+      context.extensionPath,
+      "src",
+      "webviews",
+      "scheduledTweets",
+      "tweets.html"
+    );
+    const htmlContent = fs.readFileSync(htmlPath, { encoding: "utf8" });
+
+    const scriptPath = panel.webview.asWebviewUri(
+      vscode.Uri.file(
+        path.join(
+          context.extensionPath,
+          "src",
+          "webviews",
+          "scheduledTweets",
+          "tweets.js"
+        )
+      )
+    );
+
+    const modifiedHtmlContent = htmlContent.replace(
+      "./tweets.js",
+      scriptPath.toString()
+    );
+
+    panel.webview.html = modifiedHtmlContent;
+  });
 
   vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
     const panel = vscode.window.createWebviewPanel(
@@ -32,8 +64,11 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     );
 
-
-    panel.webview.postMessage({ dbconfig });
+    panel.webview.onDidReceiveMessage((message) => {
+      if (message.type === "success") {
+        vscode.window.showInformationMessage(message.message);
+      }
+    });
 
     const htmlPath = path.join(
       context.extensionPath,

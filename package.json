@@ -14,10 +14,24 @@
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
+      "explorer": [
+        {
+          "id": "scheduledTweets",
+          "title": "Scheduled Tweets",
+          "icon": "resources/icon.svg"
+        }
+      ],
       "activitybar": [
         {
           "id": "addTweet",
           "title": "My Webview",
+          "icon": "resources/icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "scheduledTweets",
+          "title": "Scheduled Tweets",
           "icon": "resources/icon.svg"
         }
       ]
@@ -36,6 +50,20 @@
             "webview-src": "./src/webviews/tweetInput/input.html"
           }
         }
+      ],
+      "scheduledTweets": [
+        {
+          "id": "scheduledTweets",
+          "name": "View Tweets",
+          "webview": {
+            "retainContextWhenHidden": true,
+            "enableFindWidget": true,
+            "localResourceRoots": [
+              "${webviewRootUri}"
+            ],
+            "webview-src": "./src/webviews/scheduledTweets/tweets.html"
+          }
+        }
       ]
     },
     "commands": [
@@ -46,6 +74,10 @@
       {
         "command": "twicode.scheduleTweet",
         "title": "Schedule Tweet"
+      },
+      {
+        "command": "twicode.showScheduledTweets",
+        "title": "Show Scheduled Tweets"
       }
     ]
   },

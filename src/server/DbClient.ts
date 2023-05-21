@@ -53,7 +53,7 @@ export class DatabaseClient {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`;
     try {
-      const result = await this.client.query(sql, []);
+      const result = await this.query(sql, []);
       return result;
     } catch (err) {
       console.error("Error executing query:", err);
@@ -65,7 +65,7 @@ export class DatabaseClient {
     const sql = `INSERT INTO scheduled_tweets (tweet_text, scheduled_time) VALUES ($1, $2)`;
     const values = [tweetText, scheduledTime];
     try {
-      const result = await this.client.query(sql, values);
+      const result = await this.query(sql, values);
       return result;
     } catch (err) {
       console.error("Error executing query:", err);
@@ -77,7 +77,7 @@ export class DatabaseClient {
     const sql = `UPDATE scheduled_tweets SET tweet_text = $1, scheduled_time = $2 WHERE id = $3`;
     const values = [tweetText, scheduledTime, id];
     try {
-      const result = await this.client.query(sql, values);
+      const result = await this.query(sql, values);
       return result;
     } catch (err) {
       console.error("Error executing query:", err);
