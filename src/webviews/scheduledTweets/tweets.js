@@ -1,4 +1,4 @@
-fetch('/api/scheduled_tweets')
+fetch('http://localhost:3000/api/scheduled_tweets')
   .then((response) => response.json())
   .then((data) => {
     if (data.success) {
