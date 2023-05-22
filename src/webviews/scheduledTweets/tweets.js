@@ -7,10 +7,11 @@ fetch('http://localhost:3000/api/scheduled_tweets')
         tweets.forEach((tweet) => {
           const tweetItem = document.createElement('li');
           tweetItem.classList.add('tweet-item');
+          const count = 25;
 
           const tweetText = document.createElement('p');
           tweetText.classList.add('tweet-text');
-          tweetText.textContent = tweet.tweet_text;
+          tweetText.textContent = tweet.tweet_text.slice(0, count) + (tweet.tweet_text.length > count ? "..." : "");
           tweetItem.appendChild(tweetText);
 
           const tweetDate = document.createElement('span');
