@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { client } from "./server/DbClient";
 import { startServer } from "./server/server";
+import { ScheduledTweetsPanel } from "./ScheduledTweets";
 
 export async function activate(context: vscode.ExtensionContext) {
   client.connect();
@@ -12,46 +13,11 @@ export async function activate(context: vscode.ExtensionContext) {
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
-    vscode.window.showInformationMessage("It's working!!");
+    vscode.window.showInformationMessage("!!");
   });
 
   vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
-    const panel = vscode.window.createWebviewPanel(
-      "scheduledTweets",
-      "Scheduled Tweets",
-      vscode.ViewColumn.One,
-      {
-        enableScripts: true,
-      }
-    );
-
-    const htmlPath = path.join(
-      context.extensionPath,
-      "src",
-      "webviews",
-      "scheduledTweets",
-      "tweets.html"
-    );
-    const htmlContent = fs.readFileSync(htmlPath, { encoding: "utf8" });
-
-    const scriptPath = panel.webview.asWebviewUri(
-      vscode.Uri.file(
-        path.join(
-          context.extensionPath,
-          "src",
-          "webviews",
-          "scheduledTweets",
-          "tweets.js"
-        )
-      )
-    );
-
-    const modifiedHtmlContent = htmlContent.replace(
-      "./tweets.js",
-      scriptPath.toString()
-    );
-
-    panel.webview.html = modifiedHtmlContent;
+    ScheduledTweetsPanel.checkAndShow(context.extensionUri);
   });
 
   vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
