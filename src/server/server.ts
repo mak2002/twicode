@@ -42,6 +42,21 @@ export async function startServer() {
     }
   });
 
+  app.delete("/api/scheduled_tweets/:id", async (req, res) => {
+    const id = req.params.id;
+    const sql = `DELETE FROM scheduled_tweets WHERE id = $1`;
+    const values = [id];
+    console.log("Deleting tweet with id:", id);
+    try {
+      const result = await pool.query(sql, values);
+      console.log("Query executed successfully");
+      res.json({ success: true, result: result.rows });
+    } catch (err: any) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
   app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   });

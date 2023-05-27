@@ -10,6 +10,8 @@ export async function activate(context: vscode.ExtensionContext) {
   client.createTweetsTable();
   await startServer();
 
+  const scheduledTweetsProvider = new ScheduledTweetsPanel(context.extensionUri);
+
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
@@ -64,6 +66,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     panel.webview.html = modifiedHtmlContent;
   });
+
+  // Register the webview view provider
+  vscode.window.registerWebviewViewProvider(ScheduledTweetsPanel.viewType, scheduledTweetsProvider);
 
   context.subscriptions.push(disposable);
 }

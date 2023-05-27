@@ -3,23 +3,21 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 
 export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
+
   public static currentPanel: ScheduledTweetsPanel | undefined;
-
   public static readonly viewType = "scheduledTweets";
-  private _panel: vscode.WebviewPanel;
-  private _context: vscode.ExtensionContext;
 
-  private constructor(
-    panel: vscode.WebviewPanel,
-    context: vscode.ExtensionContext
-  ) {
-    this._panel = panel;
-    this._context = context;
+  // private _panel: vscode.WebviewPanel;
+  private _extensionUri: vscode.Uri;
+
+  public constructor(extensionUri: vscode.Uri) {
+    // this._panel = panel;
+    this._extensionUri = extensionUri;
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
+  private _getHtmlForWebview(webview: vscode.Webview): string {
     const htmlPath = path.join(
-      this._context.extensionPath,
+      this._extensionUri.fsPath,
       "src",
       "webviews",
       "scheduledTweets",
@@ -29,7 +27,7 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
     const scriptPath = webview.asWebviewUri(
       vscode.Uri.file(
         path.join(
-          this._context.extensionPath,
+          this._extensionUri.fsPath,
           "src",
           "webviews",
           "scheduledTweets",
@@ -48,35 +46,27 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
-    context: vscode.WebviewViewResolveContext,
+    _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
         vscode.Uri.file(
-          path.join(
-            this._context.extensionPath,
-            "src",
-            "webviews",
-            "scheduledTweets"
-          )
+          path.join(this._extensionUri.fsPath, "src", "webviews", "scheduledTweets")
         ),
       ],
     };
-
+  
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
+  
     webviewView.webview.onDidReceiveMessage((message) => {
-      console.log("message received");
-      switch (message.type) {
-        case "success":
-          vscode.window.showInformationMessage(message.message);
-          return;
-        case "error":
-          vscode.window.showErrorMessage(message.message);
-          return;
+      console.log("Received message from webview:", message);
+      switch (message.command) {
         case "deleteTweet":
+          // Handle delete functionality for the tweet
+          const tweetId = message.tweetId;
+          console.log("Tweet deleted:", tweetId);
           vscode.window.showInformationMessage("Tweet deleted");
           return;
         default:
@@ -84,16 +74,21 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
       }
     });
   }
+  
+
+  public static getPanel(): ScheduledTweetsPanel | undefined {
+    return ScheduledTweetsPanel.currentPanel;
+  }
 
   public static checkAndShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : vscode.ViewColumn.One;
 
-    if (ScheduledTweetsPanel.currentPanel) {
-      ScheduledTweetsPanel.currentPanel._panel.reveal(column);
-      return;
-    }
+    // if (ScheduledTweetsPanel.currentPanel) {
+    //   ScheduledTweetsPanel.currentPanel._panel.reveal(column);
+    //   return;
+    // }
 
     const panel = vscode.window.createWebviewPanel(
       ScheduledTweetsPanel.viewType,
@@ -129,6 +124,8 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
     );
 
     panel.webview.html = modifiedHtmlContent;
+
+    ScheduledTweetsPanel.currentPanel = new ScheduledTweetsPanel(extensionUri);
 
     panel.onDidDispose(() => {
       ScheduledTweetsPanel.currentPanel = undefined;

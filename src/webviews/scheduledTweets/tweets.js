@@ -33,10 +33,9 @@ fetch("http://localhost:3000/api/scheduled_tweets")
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
-        deleteButton.addEventListener("click", () => {
-          webvscode.postMessage({
-            command: "deleteTweet",
-            tweetId: tweet.id,
+        deleteButton.addEventListener("click", async () => {
+          await fetch("http://localhost:3000/api/scheduled_tweets/" + tweet.id, {
+            method: "DELETE",
           });
         });
         tweetButtons.appendChild(deleteButton);
