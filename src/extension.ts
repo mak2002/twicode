@@ -29,33 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     );
 
-    const htmlPath = path.join(
-      context.extensionPath,
-      "src",
-      "webviews",
-      "scheduledTweets",
-      "tweets.html"
-    );
-    const htmlContent = fs.readFileSync(htmlPath, { encoding: "utf8" });
-
-    const scriptPath = panel.webview.asWebviewUri(
-      vscode.Uri.file(
-        path.join(
-          context.extensionPath,
-          "src",
-          "webviews",
-          "scheduledTweets",
-          "tweets.js"
-        )
-      )
-    );
-
-    const modifiedHtmlContent = htmlContent.replace(
-      "./tweets.js",
-      scriptPath.toString()
-    );
-
-    panel.webview.html = modifiedHtmlContent;
+    panel.webview.html = scheduledTweetsPanel.getHtmlForWebview(context, panel);
 
     panel.webview.onDidReceiveMessage((message) => {
       console.log("Received message from webview:", message);
@@ -118,10 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // Register the webview view provider
-  vscode.window.registerWebviewViewProvider(
-    scheduledTweetsPanel.viewType,
-    scheduledTweetsPanel
-  );
+  // vscode.window.registerWebviewViewProvider(scheduledTweetsPanel.viewType, scheduledTweetsPanel);
 
   context.subscriptions.push(disposable);
 }
