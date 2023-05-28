@@ -18,7 +18,8 @@ fetch("http://localhost:3000/api/scheduled_tweets")
 
         const tweetDate = document.createElement("span");
         tweetDate.classList.add("tweet-date");
-        tweetDate.textContent = tweet.scheduled_time;
+        const date = new Date(tweet.scheduled_time).toLocaleString();
+        tweetDate.textContent = date;
         tweetItem.appendChild(tweetDate);
 
         const tweetButtons = document.createElement("div");
