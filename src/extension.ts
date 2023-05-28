@@ -10,16 +10,66 @@ export async function activate(context: vscode.ExtensionContext) {
   client.createTweetsTable();
   await startServer();
 
-  const scheduledTweetsProvider = new ScheduledTweetsPanel(context.extensionUri);
+  const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
 
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
-    vscode.window.showInformationMessage("!!");
+    vscode.window.showInformationMessage("Hello World");
   });
 
   vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
-    ScheduledTweetsPanel.checkAndShow(context.extensionUri);
+    // create new webview panel
+    const panel = vscode.window.createWebviewPanel(
+      "scheduledTweets",
+      "Scheduled Tweets",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+      }
+    );
+
+    const htmlPath = path.join(
+      context.extensionPath,
+      "src",
+      "webviews",
+      "scheduledTweets",
+      "tweets.html"
+    );
+    const htmlContent = fs.readFileSync(htmlPath, { encoding: "utf8" });
+
+    const scriptPath = panel.webview.asWebviewUri(
+      vscode.Uri.file(
+        path.join(
+          context.extensionPath,
+          "src",
+          "webviews",
+          "scheduledTweets",
+          "tweets.js"
+        )
+      )
+    );
+
+    const modifiedHtmlContent = htmlContent.replace(
+      "./tweets.js",
+      scriptPath.toString()
+    );
+
+    panel.webview.html = modifiedHtmlContent;
+
+    panel.webview.onDidReceiveMessage((message) => {
+      console.log("Received message from webview:", message);
+      switch (message.command) {
+        case "deleteTweet":
+          const tweetId = message.text;
+          console.log("did receive message:", tweetId);
+          client.deleteTweet(tweetId);
+          vscode.window.showInformationMessage("Tweet deleted");
+          return;
+        default:
+          return;
+      }
+    });
   });
 
   vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
@@ -68,7 +118,10 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // Register the webview view provider
-  vscode.window.registerWebviewViewProvider(ScheduledTweetsPanel.viewType, scheduledTweetsProvider);
+  vscode.window.registerWebviewViewProvider(
+    scheduledTweetsPanel.viewType,
+    scheduledTweetsPanel
+  );
 
   context.subscriptions.push(disposable);
 }

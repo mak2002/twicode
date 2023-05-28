@@ -84,6 +84,18 @@ export class DatabaseClient {
       throw err;
     }
   }
+
+  async deleteTweet(id: number) {
+    const sql = `DELETE FROM scheduled_tweets WHERE id = $1`;
+    const values = [id];
+    try {
+      const result = await this.query(sql, values);
+      return result;
+    } catch (err) {
+      console.error("Error executing query:", err);
+      throw err;
+    }
+  }
 }
 
 export const client = DatabaseClient.instance(dbconfig);

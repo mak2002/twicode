@@ -3,15 +3,13 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 
 export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
-
   public static currentPanel: ScheduledTweetsPanel | undefined;
-  public static readonly viewType = "scheduledTweets";
+  public readonly viewType = "scheduledTweets";
 
-  // private _panel: vscode.WebviewPanel;
   private _extensionUri: vscode.Uri;
+  public _panel: vscode.WebviewPanel | undefined;
 
   public constructor(extensionUri: vscode.Uri) {
-    // this._panel = panel;
     this._extensionUri = extensionUri;
   }
 
@@ -46,58 +44,81 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
-    _context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _context: vscode.WebviewViewResolveContext
   ) {
-    webviewView.webview.options = {
+    this._panel = vscode.window.createWebviewPanel(
+      this.viewType,
+      "Scheduled Tweets",
+      { viewColumn: vscode.ViewColumn.One },
+      {
+        enableScripts: true,
+      }
+    );
+
+    this._panel.webview.options = {
       enableScripts: true,
       localResourceRoots: [
         vscode.Uri.file(
-          path.join(this._extensionUri.fsPath, "src", "webviews", "scheduledTweets")
+          path.join(
+            this._extensionUri.fsPath,
+            "src",
+            "webviews",
+            "scheduledTweets"
+          )
         ),
       ],
     };
-  
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-  
-    webviewView.webview.onDidReceiveMessage((message) => {
+
+    console.log("Webview view resolved");
+    this._panel.webview.html = this._getHtmlForWebview(this._panel.webview);
+
+
+    this._panel.webview.onDidReceiveMessage(async (message) => {
       console.log("Received message from webview:", message);
       switch (message.command) {
         case "deleteTweet":
-          // Handle delete functionality for the tweet
-          const tweetId = message.tweetId;
-          console.log("Tweet deleted:", tweetId);
-          vscode.window.showInformationMessage("Tweet deleted");
+          const tweetId = message.text;
+          // await deleteTweet(tweetId);
+          vscode.window.showInformationMessage("Tweet deleted: ", tweetId);
           return;
         default:
           return;
       }
     });
   }
-  
 
-  public static getPanel(): ScheduledTweetsPanel | undefined {
-    return ScheduledTweetsPanel.currentPanel;
-  }
-
-  public static checkAndShow(extensionUri: vscode.Uri) {
+  public checkAndCreate(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
-      : vscode.ViewColumn.One;
+      : undefined;
 
-    // if (ScheduledTweetsPanel.currentPanel) {
-    //   ScheduledTweetsPanel.currentPanel._panel.reveal(column);
-    //   return;
-    // }
+    if (ScheduledTweetsPanel.currentPanel) {
+      ScheduledTweetsPanel.currentPanel._panel?.reveal(column);
+      return;
+    }
 
     const panel = vscode.window.createWebviewPanel(
-      ScheduledTweetsPanel.viewType,
+      this.viewType,
       "Scheduled Tweets",
-      vscode.ViewColumn.One,
+      column || vscode.ViewColumn.One,
       {
         enableScripts: true,
       }
     );
+
+    panel.webview.onDidReceiveMessage((message) => {
+      console.log("Received message asd:", message);
+      switch (message.command) {
+        case "deleteTweet":
+          // Handle delete functionality for the tweet
+          const tweetId = message.text;
+          // console.log("Tweet deleted:", tweetId);
+          vscode.window.showInformationMessage("Tweet deleted");
+          return;
+        default:
+          return;
+      }
+    });
 
     const htmlPath = path.join(
       extensionUri.fsPath,
@@ -125,7 +146,8 @@ export class ScheduledTweetsPanel implements vscode.WebviewViewProvider {
 
     panel.webview.html = modifiedHtmlContent;
 
-    ScheduledTweetsPanel.currentPanel = new ScheduledTweetsPanel(extensionUri);
+    ScheduledTweetsPanel.currentPanel = this;
+    ScheduledTweetsPanel.currentPanel._panel = panel;
 
     panel.onDidDispose(() => {
       ScheduledTweetsPanel.currentPanel = undefined;
