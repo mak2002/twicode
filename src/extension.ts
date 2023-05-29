@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { client } from "./server/DbClient";
 import { startServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
+import { TweetsInputForm } from "./TweetsInputForm";
 
 export async function activate(context: vscode.ExtensionContext) {
   client.connect();
@@ -11,6 +12,7 @@ export async function activate(context: vscode.ExtensionContext) {
   await startServer();
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
+  const tweetsInputForm = new TweetsInputForm(context.extensionUri);
 
   console.log("Twicode is now active!");
 
@@ -18,8 +20,8 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage("Hello World");
   });
 
+  // show scheduled tweets command
   vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
-
     const panel = scheduledTweetsPanel.createWebviewPanel();
 
     panel.webview.html = scheduledTweetsPanel.getHtmlForWebview(context, panel);
@@ -39,15 +41,9 @@ export async function activate(context: vscode.ExtensionContext) {
     });
   });
 
+  // schedule tweet command
   vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
-    const panel = vscode.window.createWebviewPanel(
-      "myWebview",
-      "Input Tweet",
-      vscode.ViewColumn.One,
-      {
-        enableScripts: true,
-      }
-    );
+    const panel = tweetsInputForm.createWebviewPanel();
 
     panel.webview.onDidReceiveMessage((message) => {
       if (message.type === "success") {
@@ -55,33 +51,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
 
-    const htmlPath = path.join(
-      context.extensionPath,
-      "src",
-      "webviews",
-      "tweetInput",
-      "input.html"
-    );
-    const htmlContent = fs.readFileSync(htmlPath, { encoding: "utf8" });
-
-    const scriptPath = panel.webview.asWebviewUri(
-      vscode.Uri.file(
-        path.join(
-          context.extensionPath,
-          "src",
-          "webviews",
-          "tweetInput",
-          "input.js"
-        )
-      )
-    );
-
-    const modifiedHtmlContent = htmlContent.replace(
-      "./input.js",
-      scriptPath.toString()
-    );
-
-    panel.webview.html = modifiedHtmlContent;
+    panel.webview.html = tweetsInputForm.getHtmlForWebview(context, panel);
   });
 
   // Register the webview view provider
