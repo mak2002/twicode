@@ -26,6 +26,7 @@ fetch("http://localhost:3000/api/scheduled_tweets")
         tweetButtons.classList.add("tweet-buttons");
 
         const editButton = document.createElement("button");
+        editButton.classList.add("edit-button");
         editButton.textContent = "Edit";
         editButton.addEventListener("click", () => {
           console.log("TBD");
@@ -34,6 +35,8 @@ fetch("http://localhost:3000/api/scheduled_tweets")
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
+        deleteButton.classList.add("delete-button");
+        deleteButton.style.backgroundColor = "#f44336"
         deleteButton.addEventListener("click", async () => {
           await vscode.postMessage({
             command: "deleteTweet",

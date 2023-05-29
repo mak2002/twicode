@@ -19,15 +19,8 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
-    // create new webview panel
-    const panel = vscode.window.createWebviewPanel(
-      "scheduledTweets",
-      "Scheduled Tweets",
-      vscode.ViewColumn.One,
-      {
-        enableScripts: true,
-      }
-    );
+
+    const panel = scheduledTweetsPanel.createWebviewPanel();
 
     panel.webview.html = scheduledTweetsPanel.getHtmlForWebview(context, panel);
 

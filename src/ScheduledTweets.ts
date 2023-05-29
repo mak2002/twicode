@@ -44,6 +44,17 @@ export class ScheduledTweetsPanel {
     return modifiedHtmlContent;
   }
 
+  public createWebviewPanel() {
+    return vscode.window.createWebviewPanel(
+      this.viewType,
+      "Scheduled Tweets",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+      }
+    );
+  }
+
   // public resolveWebviewView(
   //   webviewView: vscode.WebviewView,
   //   context: vscode.WebviewViewResolveContext,
