@@ -2,14 +2,14 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import { client } from "./server/DbClient";
-import { startServer } from "./server/server";
+import { startExpressServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
 import { TweetsInputForm } from "./TweetsInputForm";
 
 export async function activate(context: vscode.ExtensionContext) {
   client.connect();
   client.createTweetsTable();
-  await startServer();
+  await startExpressServer();
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
   const tweetsInputForm = new TweetsInputForm(context.extensionUri);

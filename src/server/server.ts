@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import { dbconfig } from "../dbcred";
 import * as cors from "cors";
 
-export async function startServer() {
+export async function startExpressServer() {
   const app = express();
   const port = 3000;
 
