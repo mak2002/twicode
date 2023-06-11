@@ -4,7 +4,6 @@ import * as fs from "fs";
 import { client } from "./server/DbClient";
 import { startExpressServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
-import { TweetsInputForm } from "./TweetsInputForm";
 
 export async function activate(context: vscode.ExtensionContext) {
   client.connect();
@@ -12,7 +11,6 @@ export async function activate(context: vscode.ExtensionContext) {
   await startExpressServer();
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
-  const tweetsInputForm = new TweetsInputForm(context.extensionUri);
 
   console.log("Twicode is now active!");
 
@@ -42,17 +40,6 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // schedule tweet command
-  vscode.commands.registerCommand("twicode.scheduleTweet", async () => {
-    const panel = tweetsInputForm.createWebviewPanel();
-
-    panel.webview.onDidReceiveMessage((message) => {
-      if (message.type === "success") {
-        vscode.window.showInformationMessage(message.message);
-      }
-    });
-
-    panel.webview.html = tweetsInputForm.getHtmlForWebview(context, panel);
-  });
 
   // Register the webview view provider
   // vscode.window.registerWebviewViewProvider(scheduledTweetsPanel.viewType, scheduledTweetsPanel);
