@@ -15,7 +15,7 @@ export async function activate(context: vscode.ExtensionContext) {
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
-    vscode.window.showInformationMessage("Hello World");
+    vscode.window.showInformationMessage("Hello twicode");
   });
 
   // show scheduled tweets command
