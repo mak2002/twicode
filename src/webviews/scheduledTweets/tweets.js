@@ -30,6 +30,7 @@ fetch("http://localhost:3000/api/scheduled_tweets")
         editButton.textContent = "Edit";
         editButton.addEventListener("click", () => {
           console.log("TBD");
+          consoleX();
         });
         tweetButtons.appendChild(editButton);
 
