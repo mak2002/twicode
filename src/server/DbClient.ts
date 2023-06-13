@@ -96,6 +96,17 @@ export class DatabaseClient {
       throw err;
     }
   }
+
+  async getTweets() {
+    const sql = `SELECT * FROM scheduled_tweets`;
+    try {
+      const result = await this.query(sql, []);
+      return result;
+    } catch (err) {
+      console.error("Error executing query:", err);
+      throw err;
+    }
+  }
 }
 
 export const client = DatabaseClient.instance(dbconfig);

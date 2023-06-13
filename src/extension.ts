@@ -1,17 +1,32 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import * as fs from "fs";
 import { client } from "./server/DbClient";
 import { startExpressServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
+import { TweetsDataProvider } from "./providers/TweetsProviders";
+
 
 export async function activate(context: vscode.ExtensionContext) {
+
+  await startExpressServer();
   client.connect();
   client.createTweetsTable();
-  await startExpressServer();
+
+  // get tweets from database
+  const Stweets = (await client.getTweets()).rows;
+  console.log('Stweets>>>', Stweets)
+
+  let tweets: any[] = [];
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
+  const tweetsDataProvider = new TweetsDataProvider(Stweets);
 
+  const treeView = vscode.window.createTreeView("notepad.notesList", {
+    treeDataProvider: tweetsDataProvider,
+    showCollapseAll: false,
+  });
+
+
+  
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {
@@ -38,11 +53,6 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
   });
-
-  // schedule tweet command
-
-  // Register the webview view provider
-  // vscode.window.registerWebviewViewProvider(scheduledTweetsPanel.viewType, scheduledTweetsPanel);
 
   context.subscriptions.push(disposable);
 }
