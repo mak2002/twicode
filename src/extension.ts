@@ -4,29 +4,25 @@ import { startExpressServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
 import { TweetsDataProvider } from "./providers/TweetsProviders";
 
-
 export async function activate(context: vscode.ExtensionContext) {
-
   await startExpressServer();
   client.connect();
   client.createTweetsTable();
 
   // get tweets from database
-  const Stweets = (await client.getTweets()).rows;
-  console.log('Stweets>>>', Stweets)
+  const scheduled_tweets = (await client.getTweets()).rows;
+  console.log("Stweets>>>", scheduled_tweets);
 
   let tweets: any[] = [];
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
-  const tweetsDataProvider = new TweetsDataProvider(Stweets);
+  const tweetsDataProvider = new TweetsDataProvider(scheduled_tweets);
 
   const treeView = vscode.window.createTreeView("notepad.notesList", {
     treeDataProvider: tweetsDataProvider,
     showCollapseAll: false,
   });
 
-
-  
   console.log("Twicode is now active!");
 
   let disposable = vscode.commands.registerCommand("twicode.helloWorld", () => {

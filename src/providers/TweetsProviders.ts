@@ -19,7 +19,6 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
   data: ScheduledTweet[];
 
   constructor(notesData: TweetType[]) {
-    // this.data = notesData.map((note) => new ScheduledTweet(note.id, note.tweet_text));
     const groupedData: { [scheduledDate: string]: TweetType[] } = {};
 
     // Group tweets by scheduled date
@@ -34,7 +33,10 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
     // Create tree items for each scheduled date and its children
     this.data = Object.entries(groupedData).map(([scheduledDate, tweets]) => {
-      const parentItem = new ScheduledTweet(scheduledDate, scheduledDate);
+      const parentItem = new ScheduledTweet(
+        scheduledDate,
+        new Date(scheduledDate).toUTCString().slice(0, -4)
+      );
       parentItem.children = tweets.map(
         (tweet) => new ScheduledTweet(tweet.id, tweet.tweet_text)
       );
@@ -52,18 +54,16 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
   }
 
   getTreeItem(element: ScheduledTweet): TreeItem | Thenable<TreeItem> {
-    console.log("element:::::", element);
     return element;
   }
 
   getChildren(
     element?: ScheduledTweet | undefined
   ): ProviderResult<ScheduledTweet[]> {
-    console.log("elements:::::", element);
     if (element === undefined) {
       return this.data;
     }
-    return element.children;
+    return element.children ? element.children : [];
   }
 }
 
@@ -71,7 +71,8 @@ class ScheduledTweet extends TreeItem {
   children?: ScheduledTweet[];
 
   constructor(tweetId: string, tweetTitle: string) {
-    super(tweetTitle);
+    super(tweetTitle, vscode.TreeItemCollapsibleState.Expanded);
+
     this.id = tweetId;
     this.iconPath = new ThemeIcon("note");
     this.command = {
