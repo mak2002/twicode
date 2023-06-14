@@ -35,10 +35,12 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
     this.data = Object.entries(groupedData).map(([scheduledDate, tweets]) => {
       const parentItem = new ScheduledTweet(
         scheduledDate,
-        new Date(scheduledDate).toUTCString().slice(0, -4)
+        new Date(scheduledDate).toUTCString().slice(0, -4),
+        "parent"
       );
       parentItem.children = tweets.map(
-        (tweet) => new ScheduledTweet(tweet.id, tweet.tweet_text)
+        (tweet) => new ScheduledTweet(tweet.id, tweet.tweet_text),
+        "child"
       );
       return parentItem;
     });
@@ -70,11 +72,17 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 class ScheduledTweet extends TreeItem {
   children?: ScheduledTweet[];
 
-  constructor(tweetId: string, tweetTitle: string) {
-    super(tweetTitle, vscode.TreeItemCollapsibleState.Expanded);
+  constructor(tweetId: string, tweetTitle: string, type?: string) {
+    super(tweetTitle, vscode.TreeItemCollapsibleState.Collapsed);
 
     this.id = tweetId;
-    this.iconPath = new ThemeIcon("note");
+
+    if (type === "parent") {
+      this.iconPath = new ThemeIcon("calendar");
+    } else {
+      this.iconPath = new ThemeIcon("twitter");
+      vscode.TreeItemCollapsibleState.None;
+    }
     this.command = {
       title: "Open tweet",
       command: "notepad.showScheduledTweet",
