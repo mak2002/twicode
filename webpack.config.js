@@ -1,31 +1,58 @@
-//@ts-check
-
-'use strict';
-
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
-//@ts-check
-/** @typedef {import('webpack').Configuration} WebpackConfig **/
+const baseConfig = {
+  mode: 'production', // or 'development' for development mode
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      // Add any other loaders you need for your project
+    ],
+  },
+  target: 'web',
+};
 
-/** @type WebpackConfig */
-const extensionConfig = {
-  target: 'node', // VS Code extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-	mode: 'none', // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
-
-  entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
+const webviewConfig = {
+  ...baseConfig,
+  target: 'web',
+  entry: './src/webview/main.ts',
   output: {
-    // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
+    filename: 'webview.js',
+    path: path.resolve(__dirname, 'out'),
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: './src/webview/*.css',
+          to: './style.css',
+        },
+      ],
+    }),
+  ],
+};
+
+const extensionConfig = {
+  target: 'node',
+  mode: 'none',
+  entry: './src/extension.ts',
+  output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'extension.js',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
   },
   externals: {
-    vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
-    // modules added here also need to be added in the .vscodeignore file
+    vscode: 'commonjs vscode',
   },
   resolve: {
-    // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
   },
   module: {
     rules: [
@@ -34,15 +61,16 @@ const extensionConfig = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'ts-loader'
-          }
-        ]
-      }
-    ]
+            loader: 'ts-loader',
+          },
+        ],
+      },
+    ],
   },
   devtool: 'nosources-source-map',
   infrastructureLogging: {
-    level: "log", // enables logging required for problem matchers
+    level: 'log',
   },
 };
-module.exports = [ extensionConfig ];
+
+module.exports = [extensionConfig, webviewConfig];

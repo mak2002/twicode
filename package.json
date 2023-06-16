@@ -9,7 +9,7 @@
   "categories": [
     "Other"
   ],
-  "content_security_policy": "default-src 'none'; style-src vscode-resource: 'unsafe-inline'; script-src vscode-resource: 'unsafe-inline' 'unsafe-eval' vscode-webview-resource:; media-src vscode-resource:; img-src vscode-resource: data:; connect-src vscode-resource: http://localhost:3000",
+  "content_security_policy": "default-src 'none'; style-src vscode-resource: 'self' https://*.vscode-cdn.net 'unsafe-inline'; script-src vscode-resource: 'unsafe-inline' 'unsafe-eval' vscode-webview-resource:; media-src vscode-resource:; img-src vscode-resource: data:; connect-src vscode-resource: http://localhost:3000",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
@@ -31,6 +31,10 @@
       {
         "command": "twicode.showScheduledTweets",
         "title": "Show Scheduled Tweets"
+      },
+      {
+        "command": "twicode.openTweet",
+        "title": "Open Tweet"
       }
     ],
     "viewsContainers": {
@@ -98,6 +102,7 @@
     "@typescript-eslint/parser": "^5.53.0",
     "@vscode/test-electron": "^2.2.3",
     "babel-loader": "^9.1.2",
+    "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.34.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
@@ -107,6 +112,7 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.2.2",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

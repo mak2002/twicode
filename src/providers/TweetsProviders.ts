@@ -82,10 +82,10 @@ class ScheduledTweet extends TreeItem {
     } else {
       this.iconPath = new ThemeIcon("twitter");
       vscode.TreeItemCollapsibleState.None;
+      this.command = {
+        title: "Open tweet",
+        command: "twicode.openTweet",
+      };
     }
-    this.command = {
-      title: "Open tweet",
-      command: "notepad.showScheduledTweet",
-    };
   }
 }
