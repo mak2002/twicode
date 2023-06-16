@@ -47,7 +47,6 @@ export function getWebviewContent(webview: Webview, extensionUri: Uri, note: Twe
           <div id="tags-container"></div>
         </header>
         <section id="notes-form">
-          <vscode-text-field id="title" value="${tweetTitle}" placeholder="Enter a name">Title</vscode-text-field>
           <vscode-text-area id="content"value="${note.tweet_text}" placeholder="Write your heart out, Shakespeare!" resize="vertical" rows=15>Note</vscode-text-area>
           <vscode-button id="submit-button">Save</vscode-button>
         </section>
