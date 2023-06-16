@@ -4,6 +4,7 @@ import { startExpressServer } from "./server/server";
 import { ScheduledTweetsPanel } from "./ScheduledTweets";
 import { TweetsDataProvider } from "./providers/TweetsProviders";
 import { getWebviewContent } from "./ui/getWebView";
+import { TweetType } from "./types/Tweet";
 
 export async function activate(context: vscode.ExtensionContext) {
   await startExpressServer();
@@ -28,14 +29,16 @@ export async function activate(context: vscode.ExtensionContext) {
     () => {
       const selectedTreeViewItem = treeView.selection[0];
       console.log("Selected tree view item:", selectedTreeViewItem);
-      const matchingTweet = scheduled_tweets.find(
+      const matchingTweet: TweetType = scheduled_tweets.find(
         (tweet) => tweet.id === selectedTreeViewItem.id
       );
+        const tweetTitle = matchingTweet.tweet_text.slice(0, 20);
+
 
       if (!panel) {
         panel = vscode.window.createWebviewPanel(
           "tweetDetails",
-          matchingTweet.title,
+          tweetTitle,
           vscode.ViewColumn.One,
           {
             enableScripts: true,
@@ -47,7 +50,7 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         );
       }
-      panel.title = matchingTweet.title;
+      panel.title = tweetTitle;
       panel.webview.html = getWebviewContent(
         panel.webview,
         context.extensionUri,
