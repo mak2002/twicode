@@ -18,10 +18,17 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
   data: ScheduledTweet[];
 
-  constructor(notesData: TweetType[]) {
+  constructor(tweetsData: TweetType[]) {
+    // Group tweets by scheduled date
+    this.data = [];
+    this.groupTweetsByScheduledDate(tweetsData);
+    console.log("newly constructed data>>>>:::", this.data);
+  }
+
+  groupTweetsByScheduledDate(notesData: TweetType[]) {
+    console.log("Preparing data");
     const groupedData: { [scheduledDate: string]: TweetType[] } = {};
 
-    // Group tweets by scheduled date
     for (const note of notesData) {
       const { scheduled_time } = note;
       if (scheduled_time in groupedData) {
@@ -33,26 +40,26 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
     // Create tree items for each scheduled date and its children
     this.data = Object.entries(groupedData).map(([scheduledDate, tweets]) => {
+      console.log("tweets in map:::", scheduledDate, tweets);
+
       const parentItem = new ScheduledTweet(
         scheduledDate,
         new Date(scheduledDate).toUTCString().slice(0, -4),
         "parent"
       );
+
       parentItem.children = tweets.map(
         (tweet) => new ScheduledTweet(tweet.id, tweet.tweet_text),
         "child"
       );
       return parentItem;
     });
-
-    console.log("new dataaaa:::", this.data);
   }
 
   refresh(notesData: TweetType[]): void {
     this._onDidChangeTreeData.fire();
-    this.data = notesData.map(
-      (note) => new ScheduledTweet(note.id, note.tweet_text)
-    );
+    this.groupTweetsByScheduledDate(notesData);
+    console.log("Refreshed Data????????????", this.data);
   }
 
   getTreeItem(element: ScheduledTweet): TreeItem | Thenable<TreeItem> {
