@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const selectedTreeViewItem = treeView.selection[0];
       console.log("Selected tree view item:", selectedTreeViewItem);
       const matchingTweet: TweetType = scheduled_tweets.find(
-        (tweet) => tweet.id === selectedTreeViewItem.id
+        (tweet: { id: string | undefined; }) => tweet.id === selectedTreeViewItem.id
       );
       const tweetTitle = matchingTweet.tweet_text.slice(0, 20);
 
@@ -99,30 +99,30 @@ export async function activate(context: vscode.ExtensionContext) {
           };
 
           scheduled_tweets.push(newTweet);
-          tweetsDataProvider.refresh(scheduled_tweets);
+          tweetsDataProvider.insertTweet(scheduled_tweets, tweet, randomDate);
           console.log("New tweet created:", scheduled_tweets);
         }
       });
     }
   );
 
-  const createNote = vscode.commands.registerCommand(
-    "notepad.createNote",
-    () => {
-      const id = uuidv4();
+  // const createNote = vscode.commands.registerCommand(
+  //   "notepad.createNote",
+  //   () => {
+  //     const id = uuidv4();
 
-      const newTweet: TweetType = {
-        id: "13",
-        tweet_text: "plase work",
-        scheduled_time: "2024-05-20T20:13:55.672Z",
-        created_at: "2023-05-20T20:13:55.672Z",
-      };
+  //     const newTweet: TweetType = {
+  //       id: "13",
+  //       tweet_text: "plase work",
+  //       scheduled_time: "2024-05-20T20:13:55.672Z",
+  //       created_at: "2023-05-20T20:13:55.672Z",
+  //     };
 
-      scheduled_tweets.push(newTweet);
-      tweetsDataProvider.refresh(scheduled_tweets);
-      console.log("New tweet created:", scheduled_tweets);
-    }
-  );
+  //     scheduled_tweets.push(newTweet);
+  //     tweetsDataProvider.refresh();
+  //     console.log("New tweet created:", scheduled_tweets);
+  //   }
+  // );
 
   console.log("Twicode is now active!");
 

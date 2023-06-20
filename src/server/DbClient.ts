@@ -61,8 +61,8 @@ export class DatabaseClient {
     }
   }
 
-  async insertTweet(tweetText: string, scheduledTime: string) {
-    const sql = `INSERT INTO scheduled_tweets (tweet_text, scheduled_time) VALUES ($1, $2)`;
+  async insertTweet(tweetText: string, scheduledTime: string): Promise<any> {
+    const sql = `INSERT INTO scheduled_tweets (tweet_text, scheduled_time) VALUES ($1, $2) RETURNING *`;
     const values = [tweetText, scheduledTime];
     try {
       const result = await this.query(sql, values);
@@ -97,7 +97,7 @@ export class DatabaseClient {
     }
   }
 
-  async getTweets() {
+  async getTweets(): Promise<any> {
     const sql = `SELECT * FROM scheduled_tweets`;
     try {
       const result = await this.query(sql, []);

@@ -8,6 +8,7 @@ import {
 } from "vscode";
 import { TweetType } from "../types/Tweet";
 import * as vscode from "vscode";
+import { client } from "../server/DbClient";
 
 type TreeDataOnChangeEvent = ScheduledTweet | undefined | null | void;
 
@@ -21,20 +22,47 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
   constructor(tweetsData: TweetType[]) {
     // Group tweets by scheduled date
     this.data = [];
-    this.groupTweetsByScheduledDate(tweetsData);
+    this.groupTweetsByScheduledDate(tweetsData, "asc");
     console.log("newly constructed data>>>>:::", this.data);
   }
 
-  groupTweetsByScheduledDate(notesData: TweetType[]) {
+  sortTweets(sortOrder: string, tweetsData: TweetType[]) {
+    if (sortOrder === "asc") {
+      tweetsData.sort(
+        (
+          a: { scheduled_time: string | number | Date },
+          b: { scheduled_time: string | number | Date }
+        ) => {
+          return (
+            new Date(a.scheduled_time).getTime() -
+            new Date(b.scheduled_time).getTime()
+          );
+        }
+      );
+    } else {
+      tweetsData.sort((a, b) => {
+        return (
+          new Date(b.scheduled_time).getTime() -
+          new Date(a.scheduled_time).getTime()
+        );
+      });
+    }
+
+    return tweetsData;
+  }
+
+  groupTweetsByScheduledDate(tweetsData: TweetType[], sortOrder: string) {
     console.log("Preparing data");
     const groupedData: { [scheduledDate: string]: TweetType[] } = {};
 
-    for (const note of notesData) {
-      const { scheduled_time } = note;
+    const sortedTweets = this.sortTweets(sortOrder, tweetsData);
+
+    for (const tweet of sortedTweets) {
+      const { scheduled_time } = tweet;
       if (scheduled_time in groupedData) {
-        groupedData[scheduled_time].push(note);
+        groupedData[scheduled_time].push(tweet);
       } else {
-        groupedData[scheduled_time] = [note];
+        groupedData[scheduled_time] = [tweet];
       }
     }
 
@@ -56,9 +84,22 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
     });
   }
 
-  refresh(notesData: TweetType[]): void {
+  async insertTweet(
+    current_tweets: TweetType[],
+    tweet_text: string,
+    scheduled_time: string
+  ) {
+    const newTweets: TweetType[] = await client.insertTweet(
+      tweet_text,
+      scheduled_time
+    );
+    console.log("Inserting Tweet", newTweets);
+    this.refresh(current_tweets, newTweets);
+  }
+
+  refresh(current_tweets: TweetType[], tweetsData: TweetType[]): void {
     this._onDidChangeTreeData.fire();
-    this.groupTweetsByScheduledDate(notesData);
+    this.groupTweetsByScheduledDate(current_tweets, "asc");
     console.log("Refreshed Data????????????", this.data);
   }
 
