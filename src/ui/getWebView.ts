@@ -13,6 +13,7 @@ import { TweetType } from "../types/Tweet";
  */
 export function getWebviewContent(webview: Webview, extensionUri: Uri, note: TweetType) {
   const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
+  console.log('webviewUri', webviewUri);
   const styleUri = getUri(webview, extensionUri, ["out", "style.css"]);
 
   const tweetTitle = note.tweet_text.slice(0, 20) + "...";
@@ -47,7 +48,7 @@ export function getWebviewContent(webview: Webview, extensionUri: Uri, note: Twe
           <div id="tags-container"></div>
         </header>
         <section id="notes-form">
-          <vscode-text-area id="content"value="${note.tweet_text}" placeholder="Write your heart out, Shakespeare!" resize="vertical" rows=15>Tweet</vscode-text-area>
+          <vscode-text-area id="content" value="${note.tweet_text}" placeholder="Write your heart out, Shakespeare!" resize="vertical" rows=15>Tweet</vscode-text-area>
           <vscode-button id="submit-button">Save</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>

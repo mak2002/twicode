@@ -45,7 +45,7 @@
       "activitybar": [
         {
           "id": "notepad",
-          "title": "Notepad",
+          "title": "twicode",
           "icon": "$(notebook)"
         }
       ]
@@ -54,7 +54,7 @@
       "notepad": [
         {
           "id": "notepad.notesList",
-          "name": "My Notes",
+          "name": "Tweets",
           "type": "tree",
           "visibility": "visible"
         }
@@ -63,7 +63,7 @@
     "viewsWelcome": [
       {
         "view": "notepad.notesList",
-        "contents": "No notes yet!\n[Create a note](command:notepad.createNote)"
+        "contents": "No Tweets yet!\n[Create a note](command:notepad.createNote)"
       }
     ],
     "menus": {

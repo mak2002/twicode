@@ -22,8 +22,7 @@ provideVSCodeDesignSystem().register(
 );
 
 // Get access to the VS Code API from within the webview context
-const vscode: any = acquireVsCodeApi();
-
+const webvscode = acquireVsCodeApi();
 // Just like a regular webpage we need to wait for the webview
 // DOM to load before we can reference any of the HTML elements
 // or toolkit components
@@ -31,7 +30,7 @@ window.addEventListener("load", main);
 
 function main() {
   setVSCodeMessageListener();
-  vscode.postMessage({ command: "requestNoteData" });
+  // vscode.postMessage({ command: "requestNoteData" });
 
   // To get improved type annotations/IntelliSense the associated class for
   // a given toolkit component can be imported and used to type cast a reference
@@ -51,27 +50,29 @@ function setVSCodeMessageListener() {
     switch (command) {
       case "receiveDataInWebview":
         openedNote = noteData;
+        console.log('openedNote>>', openedNote);
         break;
     }
   });
 }
 
 function saveNote() {
-  const titleInput = document.getElementById("title") as TextField;
-  const noteInput = document.getElementById("content") as TextArea;
+  console.log('saveNote called');
+  const tweetText = document.getElementById("content") as TextArea;
 
-  const titleInputValue = titleInput?.value;
-  const noteInputValue = noteInput?.value;
+  const tweetTextValue = tweetText?.value;
 
-  const noteToUpdate = {
+  console.log('changed values::::: ', tweetTextValue);
+
+  const newTweet = {
     id: openedNote.id,
-    title: titleInputValue,
-    content: noteInputValue,
-  };
+  }
 
-  vscode.postMessage({ command: "updateNote", note: noteToUpdate });
+
+//   vscode.postMessage({ command: "updateNote", note: noteToUpdate });
 }
 
 function acquireVsCodeApi() {
-  throw new Error("Function not implemented.");
+  // @ts-ignore
+  return acquireVsCodeApi();
 }
