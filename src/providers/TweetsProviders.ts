@@ -59,6 +59,7 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
     for (const tweet of sortedTweets) {
       const { scheduled_time } = tweet;
+
       if (scheduled_time in groupedData) {
         groupedData[scheduled_time].push(tweet);
       } else {
@@ -68,16 +69,18 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
     // Create tree items for each scheduled date and its children
     this.data = Object.entries(groupedData).map(([scheduledDate, tweets]) => {
-      console.log("tweets in map:::", scheduledDate, tweets);
-
       const parentItem = new ScheduledTweet(
         scheduledDate,
-        new Date(scheduledDate).toUTCString().slice(0, -4),
+        new Date(scheduledDate).toUTCString().slice(0, -12),
         "parent"
       );
 
+      const newTime = new Date(new Date(scheduledDate).getTime() * 1000)
+        .toUTCString()
+        .slice(17, -3);
+
       parentItem.children = tweets.map(
-        (tweet) => new ScheduledTweet(tweet.id, tweet.tweet_text),
+        (tweet) => new ScheduledTweet(tweet.id, newTime + '| ' + tweet.tweet_text),
         "child"
       );
       return parentItem;

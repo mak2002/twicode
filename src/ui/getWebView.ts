@@ -11,9 +11,12 @@ import { TweetType } from "../types/Tweet";
  * @returns A template string literal containing the HTML that should be
  * rendered within the webview panel
  */
-export function getWebviewContent(webview: Webview, extensionUri: Uri, note: TweetType) {
+export function getWebviewContent(
+  webview: Webview,
+  extensionUri: Uri,
+  note: TweetType
+) {
   const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
-  console.log('webviewUri', webviewUri);
   const styleUri = getUri(webview, extensionUri, ["out", "style.css"]);
 
   const tweetTitle = note.tweet_text.slice(0, 20) + "...";

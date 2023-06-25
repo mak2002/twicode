@@ -1,9 +1,7 @@
 import {
   provideVSCodeDesignSystem,
   Button,
-  Tag,
   TextArea,
-  TextField,
   vsCodeButton,
   vsCodeTag,
   vsCodeTextArea,
