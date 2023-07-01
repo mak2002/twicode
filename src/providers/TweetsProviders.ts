@@ -8,7 +8,7 @@ import {
 } from "vscode";
 import { TweetType } from "../types/Tweet";
 import * as vscode from "vscode";
-import { client } from "../server/DbClient";
+import { client as dbClient } from "../server/DbClient";
 import { randomUUID } from "crypto";
 
 type TreeDataOnChangeEvent = ScheduledTweet | undefined | null | void;
@@ -88,28 +88,33 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
     });
   }
 
-  async insertTweet(
-    current_tweets: TweetType[],
-    tweet_text: string,
-    scheduled_time: string
-  ) {
-    const newTweets: TweetType[] = await client.insertTweet(
+  async insertTweet(tweet_text: string, scheduled_time: string) {
+    const newTweets: TweetType[] = await dbClient.insertTweet(
       randomUUID(),
       tweet_text,
       scheduled_time
     );
+    // fetch all tweets from database
+    let scheduled_tweets = (await dbClient.getTweets()).rows;
     console.log("Inserting Tweet", newTweets);
-    this.refresh(current_tweets, newTweets);
+    this.refresh(scheduled_tweets);
   }
 
-  async deleteTweet(current_tweets: TweetType[], tweet: TweetType) {
-    await client.deleteTweet(tweet.id);
-    let scheduled_tweets = (await client.getTweets()).rows;
+  async deleteTweet(tweet: TweetType) {
+    try {
+      // Delete tweet from database and check if it was successful
+      const deletedTweet = await dbClient.deleteTweet(tweet.id);
+      console.log("Deleted Tweet", deletedTweet);
 
-    this.refresh(current_tweets, scheduled_tweets);
+      let scheduled_tweets = (await dbClient.getTweets()).rows;
+      console.log("dont show deleted Tweets", scheduled_tweets);
+      this.refresh(scheduled_tweets);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  refresh(current_tweets: TweetType[], tweetsData: TweetType[]): void {
+  refresh(current_tweets: TweetType[]): void {
     this._onDidChangeTreeData.fire();
     this.groupTweetsByScheduledDate(current_tweets, "asc");
     console.log("Refreshed Data????????????", this.data);

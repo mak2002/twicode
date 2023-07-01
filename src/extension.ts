@@ -16,22 +16,22 @@ export async function activate(context: vscode.ExtensionContext) {
   let scheduled_tweets = (await client.getTweets()).rows;
   console.log("scheduled_tweets", scheduled_tweets);
 
-  if (scheduled_tweets.length === 0) {
-    scheduled_tweets = [
-      {
-        id: uuidv4(),
-        tweet_text: "This is a demo tweet",
-        scheduled_time: "2021-08-01 12:00:00",
-        created_at: "2021-08-01 12:00:00",
-      },
-      {
-        id: uuidv4(),
-        tweet_text: "This is another demo tweet",
-        scheduled_time: "2021-08-01 12:00:00",
-        created_at: "2021-08-01 12:00:00",
-      },
-    ];
-  }
+  // if (scheduled_tweets.length === 0) {
+  //   scheduled_tweets = [
+  //     {
+  //       id: uuidv4(),
+  //       tweet_text: "This is a demo tweet",
+  //       scheduled_time: "2021-08-01 12:00:00",
+  //       created_at: "2021-08-01 12:00:00",
+  //     },
+  //     {
+  //       id: uuidv4(),
+  //       tweet_text: "This is another demo tweet",
+  //       scheduled_time: "2021-08-01 12:00:00",
+  //       created_at: "2021-08-01 12:00:00",
+  //     },
+  //   ];
+  // }
 
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
   const tweetsDataProvider = new TweetsDataProvider(scheduled_tweets);
@@ -84,9 +84,9 @@ export async function activate(context: vscode.ExtensionContext) {
   const deleteTweetCommand = vscode.commands.registerCommand(
     "twicode.deleteTweet",
     async (tweet: TweetType) => {
-      await tweetsDataProvider.deleteTweet(scheduled_tweets, tweet);
-      scheduled_tweets = (await client.getTweets()).rows;
-      tweetsDataProvider.data = scheduled_tweets;
+      await tweetsDataProvider.deleteTweet(tweet);
+      // (await client.getTweets()).rows;
+      // tweetsDataProvider.data = scheduled_tweets;
       vscode.window.showInformationMessage("Tweet deleted");
     }
   );
@@ -112,8 +112,7 @@ export async function activate(context: vscode.ExtensionContext) {
             created_at: "2021-08-01 12:00:00",
           };
 
-          scheduled_tweets.push(newTweet);
-          tweetsDataProvider.insertTweet(scheduled_tweets, tweet, randomDate);
+          tweetsDataProvider.insertTweet(tweet, randomDate);
         }
       });
     }
