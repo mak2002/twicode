@@ -24,7 +24,7 @@
         "icon": "$(tweet)"
       },
       {
-        "command": "notepad.deleteNote",
+        "command": "twicode.deleteTweet",
         "title": "Notepad: Delete note",
         "icon": "$(trash)"
       },
@@ -75,7 +75,7 @@
       ],
       "view/item/context": [
         {
-          "command": "notepad.deleteNote",
+          "command": "twicode.deleteTweet",
           "group": "inline"
         }
       ]

@@ -9,6 +9,7 @@ import {
 import { TweetType } from "../types/Tweet";
 import * as vscode from "vscode";
 import { client } from "../server/DbClient";
+import { randomUUID } from "crypto";
 
 type TreeDataOnChangeEvent = ScheduledTweet | undefined | null | void;
 
@@ -23,7 +24,6 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
     // Group tweets by scheduled date
     this.data = [];
     this.groupTweetsByScheduledDate(tweetsData, "asc");
-    console.log("newly constructed data>>>>:::", this.data);
   }
 
   sortTweets(sortOrder: string, tweetsData: TweetType[]) {
@@ -80,7 +80,8 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
         .slice(17, -3);
 
       parentItem.children = tweets.map(
-        (tweet) => new ScheduledTweet(tweet.id, newTime + '| ' + tweet.tweet_text),
+        (tweet) =>
+          new ScheduledTweet(tweet.id, newTime + "| " + tweet.tweet_text),
         "child"
       );
       return parentItem;
@@ -93,11 +94,19 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
     scheduled_time: string
   ) {
     const newTweets: TweetType[] = await client.insertTweet(
+      randomUUID(),
       tweet_text,
       scheduled_time
     );
     console.log("Inserting Tweet", newTweets);
     this.refresh(current_tweets, newTweets);
+  }
+
+  async deleteTweet(current_tweets: TweetType[], tweet: TweetType) {
+    await client.deleteTweet(tweet.id);
+    let scheduled_tweets = (await client.getTweets()).rows;
+
+    this.refresh(current_tweets, scheduled_tweets);
   }
 
   refresh(current_tweets: TweetType[], tweetsData: TweetType[]): void {

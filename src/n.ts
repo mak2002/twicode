@@ -13,9 +13,10 @@ export async function activate(context: vscode.ExtensionContext) {
   client.createTweetsTable();
   let panel: vscode.WebviewPanel | undefined = undefined;
 
+  // get tweets from database
   let scheduled_tweets = (await client.getTweets()).rows;
-  console.log("scheduled_tweets", scheduled_tweets);
 
+  // make demo tweets if no tweets in database
   if (scheduled_tweets.length === 0) {
     scheduled_tweets = [
       {
@@ -41,6 +42,16 @@ export async function activate(context: vscode.ExtensionContext) {
     showCollapseAll: false,
   });
 
+  // const deleteTweetCommand = vscode.commands.registerCommand(
+  //   "twicode.deleteTweet",
+  //   async (tweet: TweetType) => {
+  //     await tweetsDataProvider.deleteTweet(scheduled_tweets, tweet.id);
+  //     scheduled_tweets = (await client.getTweets()).rows;
+  //     tweetsDataProvider.data = scheduled_tweets;
+  //     // treeView.message = "Deleted Tweet";
+  //   }
+  // );
+
   const openTweetCommand = vscode.commands.registerCommand(
     "twicode.openTweet",
     () => {
@@ -60,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
           {
             enableScripts: true,
 
-            // restrict the webview to only loading content from our extension's `media` directory.
+            // And restrict the webview to only loading content from our extension's `media` directory.
             localResourceRoots: [
               vscode.Uri.joinPath(context.extensionUri, "out"),
             ],
@@ -74,20 +85,11 @@ export async function activate(context: vscode.ExtensionContext) {
         matchingTweet
       );
 
+      // send message to webview
       panel.webview.postMessage({
         command: "receiveDataInWebview",
         payload: JSON.stringify(matchingTweet),
       });
-    }
-  );
-
-  const deleteTweetCommand = vscode.commands.registerCommand(
-    "twicode.deleteTweet",
-    async (tweet: TweetType) => {
-      await tweetsDataProvider.deleteTweet(scheduled_tweets, tweet);
-      scheduled_tweets = (await client.getTweets()).rows;
-      tweetsDataProvider.data = scheduled_tweets;
-      vscode.window.showInformationMessage("Tweet deleted");
     }
   );
 
@@ -98,22 +100,25 @@ export async function activate(context: vscode.ExtensionContext) {
         placeHolder: "Enter your tweet",
       });
 
-      const randomDate = new Date(
+      // random date
+      const random_scheduled_time = new Date(
         +new Date() - Math.floor(Math.random() * 10000000000)
       ).toISOString();
 
       const id = uuidv4();
-      prompt.then((tweet) => {
-        if (tweet) {
-          const newTweet: TweetType = {
-            id: id,
-            tweet_text: tweet,
-            scheduled_time: randomDate,
+      console.log("id:", id);
+      prompt.then((tweet_text) => {
+        if (tweet_text) {
+          const newTweet: any = {
+            id: 100,
+            tweet_text: tweet_text,
+            scheduled_time: random_scheduled_time,
             created_at: "2021-08-01 12:00:00",
           };
 
           scheduled_tweets.push(newTweet);
-          tweetsDataProvider.insertTweet(scheduled_tweets, tweet, randomDate);
+          tweetsDataProvider.insertTweet(scheduled_tweets, tweet_text, random_scheduled_time);
+          console.log("New tweet created:", scheduled_tweets);
         }
       });
     }
@@ -125,6 +130,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage("Hello twicode");
   });
 
+  // show scheduled tweets command
   vscode.commands.registerCommand("twicode.showScheduledTweets", async () => {
     const panel = scheduledTweetsPanel.createWebviewPanel();
 
@@ -135,6 +141,7 @@ export async function activate(context: vscode.ExtensionContext) {
       switch (message.command) {
         case "deleteTweet":
           const tweetId = message.text;
+          console.log("did receive message:", tweetId);
           client.deleteTweet(tweetId);
           vscode.window.showInformationMessage("Tweet deleted");
           return;
@@ -146,7 +153,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(openTweetCommand);
   context.subscriptions.push(scheduleTweetsCommand);
-  context.subscriptions.push(deleteTweetCommand);
+  // context.subscriptions.push(deleteTweetCommand);
   context.subscriptions.push(disposable);
 }
 

@@ -47,7 +47,7 @@ export class DatabaseClient {
 
   async createTweetsTable() {
     const sql = `CREATE TABLE IF NOT EXISTS scheduled_tweets (
-      id SERIAL PRIMARY KEY,
+      id UUID PRIMARY KEY,
       tweet_text TEXT NOT NULL,
       scheduled_time TIMESTAMP NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -61,9 +61,9 @@ export class DatabaseClient {
     }
   }
 
-  async insertTweet(tweetText: string, scheduledTime: string): Promise<any> {
-    const sql = `INSERT INTO scheduled_tweets (tweet_text, scheduled_time) VALUES ($1, $2) RETURNING *`;
-    const values = [tweetText, scheduledTime];
+  async insertTweet(id: string, tweetText: string, scheduledTime: string): Promise<any> {
+    const sql = `INSERT INTO scheduled_tweets (id, tweet_text, scheduled_time) VALUES ($1, $2, $3) RETURNING *`;
+    const values = [id, tweetText, scheduledTime];
     try {
       const result = await this.query(sql, values);
       return result;
@@ -85,8 +85,8 @@ export class DatabaseClient {
     }
   }
 
-  async deleteTweet(id: number) {
-    const sql = `DELETE FROM scheduled_tweets WHERE id = $1`;
+  async deleteTweet(id: string): Promise<any> {
+    const sql = `DELETE FROM scheduled_tweets WHERE id = $1 RETURNING *`;
     const values = [id];
     try {
       const result = await this.query(sql, values);
