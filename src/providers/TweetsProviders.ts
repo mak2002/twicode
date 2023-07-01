@@ -81,7 +81,7 @@ export class TweetsDataProvider implements TreeDataProvider<ScheduledTweet> {
 
       parentItem.children = tweets.map(
         (tweet) =>
-          new ScheduledTweet(tweet.id, newTime + "| " + tweet.tweet_text),
+          new ScheduledTweet(tweet.id, newTime + "• " + tweet.tweet_text),
         "child"
       );
       return parentItem;

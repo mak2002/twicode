@@ -16,23 +16,6 @@ export async function activate(context: vscode.ExtensionContext) {
   let scheduled_tweets = (await client.getTweets()).rows;
   console.log("scheduled_tweets", scheduled_tweets);
 
-  // if (scheduled_tweets.length === 0) {
-  //   scheduled_tweets = [
-  //     {
-  //       id: uuidv4(),
-  //       tweet_text: "This is a demo tweet",
-  //       scheduled_time: "2021-08-01 12:00:00",
-  //       created_at: "2021-08-01 12:00:00",
-  //     },
-  //     {
-  //       id: uuidv4(),
-  //       tweet_text: "This is another demo tweet",
-  //       scheduled_time: "2021-08-01 12:00:00",
-  //       created_at: "2021-08-01 12:00:00",
-  //     },
-  //   ];
-  // }
-
   const scheduledTweetsPanel = new ScheduledTweetsPanel(context.extensionUri);
   const tweetsDataProvider = new TweetsDataProvider(scheduled_tweets);
 
@@ -43,13 +26,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const openTweetCommand = vscode.commands.registerCommand(
     "twicode.openTweet",
-    () => {
+    async () => {
+      const scheduled_tweets = (await client.getTweets()).rows;
+
       const selectedTreeViewItem = treeView.selection[0];
       console.log("Selected tree view item:", selectedTreeViewItem);
+
       const matchingTweet: TweetType = scheduled_tweets.find(
         (tweet: { id: string | undefined }) =>
           tweet.id === selectedTreeViewItem.id
       );
+
       const tweetTitle = matchingTweet.tweet_text.slice(0, 20);
 
       if (!panel) {
