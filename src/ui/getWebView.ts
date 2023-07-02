@@ -23,6 +23,20 @@ export function getWebviewContent(
 
   const nonce = getNonce();
 
+  const formattedScheduledTime = formatDateTime(note.scheduled_time);
+
+  function formatDateTime(dateTimeStr: string) {
+    const dateTime = new Date(dateTimeStr);
+    const year = dateTime.getFullYear().toString();
+    const month = (dateTime.getMonth() + 1).toString().padStart(2, "0");
+    const day = dateTime.getDate().toString().padStart(2, "0");
+    const hour = dateTime.getHours().toString().padStart(2, "0");
+    const minute = dateTime.getMinutes().toString().padStart(2, "0");
+
+    const formattedDateTime = `${year}-${month}-${day}T${hour}:${minute}`;
+    return formattedDateTime;
+  }
+
   webview.onDidReceiveMessage((message) => {
     const command = message.command;
     switch (command) {
@@ -52,7 +66,8 @@ export function getWebviewContent(
         </header>
         <section id="notes-form">
           <vscode-text-area id="content" value="${note.tweet_text}" placeholder="Write your heart out, Shakespeare!" resize="vertical" rows=15>Tweet</vscode-text-area>
-          <vscode-button id="submit-button">Save</vscode-button>
+          <input type="datetime-local" id="date" name="date" value="${formattedScheduledTime}"></input>
+          <vscode-button id="submit-button">Update</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>
