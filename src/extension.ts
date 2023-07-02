@@ -72,8 +72,6 @@ export async function activate(context: vscode.ExtensionContext) {
     "twicode.deleteTweet",
     async (tweet: TweetType) => {
       await tweetsDataProvider.deleteTweet(tweet);
-      // (await client.getTweets()).rows;
-      // tweetsDataProvider.data = scheduled_tweets;
       vscode.window.showInformationMessage("Tweet deleted");
     }
   );
