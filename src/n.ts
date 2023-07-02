@@ -117,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
           };
 
           scheduled_tweets.push(newTweet);
-          tweetsDataProvider.insertTweet(scheduled_tweets, tweet_text, random_scheduled_time);
+          // tweetsDataProvider.insertTweet(scheduled_tweets, tweet_text, random_scheduled_time);
           console.log("New tweet created:", scheduled_tweets);
         }
       });

@@ -66,8 +66,8 @@ export function getWebviewContent(
         </header>
         <section id="notes-form">
           <vscode-text-area id="content" value="${note.tweet_text}" placeholder="Write your heart out, Shakespeare!" resize="vertical" rows=15>Tweet</vscode-text-area>
-          <label for="date">Scheduled Date</label>
-          <input type="datetime-local" id="date" name="date" value="${formattedScheduledTime}"></input>
+          <label for="scheduled_date">Scheduled Date</label>
+          <input class="scheduled_date" type="datetime-local" id="scheduled_date" name="scheduled_date" value="${formattedScheduledTime}"></input>
           <vscode-button id="submit-button">Update</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>

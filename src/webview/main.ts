@@ -20,6 +20,7 @@ provideVSCodeDesignSystem().register(
 );
 
 // Get access to the VS Code API from within the webview context
+// @ts-ignore
 const webvscode = acquireVsCodeApi();
 // Just like a regular webpage we need to wait for the webview
 // DOM to load before we can reference any of the HTML elements
@@ -34,7 +35,7 @@ function main() {
   // a given toolkit component can be imported and used to type cast a reference
   // to the element (i.e. the `as Button` syntax)
   const saveButton = document.getElementById("submit-button") as Button;
-  saveButton.addEventListener("click", () => saveNote());
+  saveButton.addEventListener("click", () => updateTweet());
 }
 
 // Stores the currently opened note info so we know the ID when we update it on save
@@ -54,23 +55,19 @@ function setVSCodeMessageListener() {
   });
 }
 
-function saveNote() {
-  console.log('saveNote called');
+function updateTweet() {
   const tweetText = document.getElementById("content") as TextArea;
-
-  const tweetTextValue = tweetText?.value;
-
-  console.log('changed values::::: ', tweetTextValue);
+  const tweetScheduledDate = document.getElementById("scheduled_date") as HTMLInputElement;
 
   const newTweet = {
     id: openedNote.id,
-  }
+    tweet_text: tweetText.value,
+    scheduled_date: tweetScheduledDate.value,
+  };
 
-
-//   vscode.postMessage({ command: "updateNote", note: noteToUpdate });
+  console.log('newTweet>>', newTweet);
+  
+  // Send the updated tweet data back to the extension
+  // webvscode.postMessage({ command: "updateNote", note: newTweet });
 }
 
-function acquireVsCodeApi() {
-  // @ts-ignore
-  return acquireVsCodeApi();
-}
